@@ -1,0 +1,13 @@
+# OAuth secrets — NEVER commit
+credentials.json
+token.json
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+*.egg-info/
+
+# Env
+.env
