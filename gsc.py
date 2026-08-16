@@ -1,4 +1,5 @@
 import os
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 import json
 from typing import List, Dict, Any, Optional, Tuple
 from datetime import datetime, timedelta
@@ -32,8 +33,15 @@ def get_service():
                 raise FileNotFoundError(
                     "credentials.json file not found. Please download it from Google Cloud Console."
                 )
-            flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
-            creds = flow.run_local_server(port=0)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                CREDENTIALS_FILE, SCOPES,
+                redirect_uri='http://localhost'
+            )
+            auth_url, _ = flow.authorization_url(prompt='consent', access_type='offline')
+            print(f"\n\n===== GOOGLE AUTH REQUIRED =====\n1. Visit this URL:\n{auth_url}\n\n2. Authorize the app\n3. You'll be redirected to localhost (page won't load - that's OK)\n4. Copy the FULL URL from your browser address bar\n5. Paste it below\n================================\n", flush=True)
+            redirect_response = input("Paste the full redirect URL: ")
+            flow.fetch_token(authorization_response=redirect_response)
+            creds = flow.credentials
         
         # Save the credentials for future use
         with open(TOKEN_FILE, 'w') as token:
